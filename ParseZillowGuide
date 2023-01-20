@@ -1,0 +1,78 @@
+package webScrappingP;
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+	/*
+	 * This class is used for HTML parsing from URL using Jsoup.
+	 * @author Andrew Schwartz
+	 */
+
+	public class ParseZillowGuide {
+		public static void main(String args[]){
+			print("running...UK & WORLD INDICES");
+			Document document;
+			try {
+				//Get Document object after parsing the html from given url.
+				final String url="https://web.archive.org/web/20190104110157/http://shares.telegraph.co.uk/indices/?index=MCX";
+				document = Jsoup.connect(url).get();
+
+				String title = document.title(); //Get title
+				
+				print("  Title: " + title); //Print title.
+				Elements element=document.select(".full td:not(.right) a");
+				Element img = document.select("img").first();
+				System.out.println(img.outerHtml());
+				getImages(img.absUrl("src"));
+				System.out.println(element.first().text());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			print("done");
+		}
+		
+		private static void getImages(String src) throws IOException {
+
+	String folder = null;
+			
+		//Extract the name of the image from the src attribute
+			int indexname = src.lastIndexOf("/");
+		
+			if (indexname == src.length()) {
+			src = src.substring(1, indexname);
+			}
+
+			indexname = src.lastIndexOf("/");
+			String name = src.substring(indexname, src.length());
+			System.out.println(name);
+			
+			//Open a URL Stream
+			URL url = new URL(src);
+			InputStream in = url.openStream();
+		
+			String folderPath="D:\\A env mtech\\stat";
+			OutputStream out = new BufferedOutputStream(new FileOutputStream( folderPath+ name));
+			
+			for (int b; (b = in.read()) != -1;) {
+			out.write(b);
+			}
+			out.close();
+			in.close() ;
+			}
+		
+		
+			
+
+		public static void print(String string) {
+			System.out.println(string);
+		}
+	}
+	
